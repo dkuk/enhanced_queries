@@ -1,13 +1,28 @@
+<%
+  filter_fields = [[l(:field_assigned_to),:assigned_to_id], [l(:field_author),:author_id],[l(:field_executor),:executor_id]]
+  filter_fields += IssueCustomField.where("field_format='user'").order("name").collect{|cf| [cf.name,"cf_#{cf.id}"]}  
+  filt_opts = options_for_select(filter_fields, :selected => @settings[:custom_rule])
+%>
 <table cellspacing="15">
 <tr>
-<td><%=l(:label_enable_enhanced_queries)%></td>
-<td><%=check_box_tag 'settings[enable]', true, @settings['enable'] == "true" %></td>
+  <td><%=l(:label_enable_enhanced_queries)%></td>
+  <td><%=check_box_tag 'settings[enable]', true, @settings['enable'] == "true" %></td>
 </tr>
 <tr>
-<td><%=l(:label_enable_counts)%></td>
-<td><%=check_box_tag 'settings[show_count]', true, @settings['show_count'] == "true" %></td>
+  <td><%=l(:label_enable_counts)%></td>
+  <td><%=check_box_tag 'settings[show_count]', true, @settings['show_count'] == "true" %></td>
 </tr>
-
+<tr>
+  <td style="vertical-align:top;"><%=l(:label_enhanced_queries_selector)%></td>
+  <td style="vertical-align:top;"><%= select_tag('settings[specific_roles]',
+      options_from_collection_for_select( Role.order("name"),
+                                          "id",
+                                          "name",
+                                          @settings[:specific_roles]), { :multiple => true, :size => 8 } ) %>
+ -
+    <%= select_tag('settings[custom_rule]', filt_opts ) %>
+  </td>
+</tr>
 
 
 </table>

@@ -1,31 +1,49 @@
 <% if(Setting.plugin_enhanced_queries['enable'] == 'true') %>
 	<% if @project %>
-		<h3><%= l(:queries_by_roles) %></h3>
+		<h3><%= l(:queries_by_roles) %></h3>		
 
+		<% specific_roles = Setting.plugin_enhanced_queries['specific_roles'].nil? ? [] : Setting.plugin_enhanced_queries['specific_roles'] %>
+		<% custom_rule = Setting.plugin_enhanced_queries['custom_rule'].nil? ? nil : Setting.plugin_enhanced_queries['custom_rule'] %>
 	
-		<% roles=IssuesHelper.render_queries_by_role(@project) %>
-		<% roles_id=nil %>
+		<% roles = IssuesHelper.render_queries_by_role(@project) %>
+		<% roles_id = nil %>
 		
 		<ul>
 		<% for r in roles %>
-			<% if roles_id!=r.roles_id%>
-				<% if roles_id!=nil %>
+			<% custom_filter = specific_roles.include?(r.roles_id.to_s) ? custom_rule : :assigned_to_id %>
+			<% if roles_id != r.roles_id%>
+				<% if roles_id != nil %>
 					</ul></li>
 				<% end %>
-				
-				<li><b><%= link_to_filter r.roles_name, [[ :assigned_to_role, '=',  r.roles_id]], :project_id => @project.identifier %></b>
+
+				<% role_users = User.find_by_sql("
+															SELECT u.* FROM #{User.table_name} u
+																INNER JOIN #{Member.table_name} m ON m.user_id=u.id AND m.project_id=#{@project.id}
+																INNER JOIN #{MemberRole.table_name} mr ON mr.member_id=m.id AND mr.role_id=#{r.roles_id}
+															WHERE u.type!='Group' ")
+					 users_ids = role_users.collect{|u| u.id.to_s }
+				%>
+
+				<li><b><%= link_to r.roles_name, 
+													 IssuesHelper.options_for_filter([[ :status_id, 'o', ''], [ custom_filter, '=',  users_ids]], 
+													 																 {:project_id => @project.identifier}) %>
+				</b>
 					<% if Setting.plugin_enhanced_queries['show_count']%>
-						<span class="count">(<%= h IssuesHelper.get_total_issues_on_assigned_to_role(r.roles_id, @project) %>)</span> 
+						<span class="count">(<%= h IssuesHelper.get_open_issues_on_role(custom_filter, r.roles_id, @project) %>)</span> 
 					<% end %>			
-				<ul>
-				<li>
-					<nobr><%= link_to_filter r.user_name, [[ :status_id, 'o', '44444'], [ :assigned_to_id, '=',  r.user_id]], {:project_id => @project.identifier, :group_by => "status"} %></nobr>
-					<% if Setting.plugin_enhanced_queries['show_count']%> <span class="count">(<%= h IssuesHelper.get_total_issues_on_assigned_to_id(r.user_id, @project) %>)</span> <% end %>
-				</li>
+					<ul>
+					<li>
+						<nobr><%= link_to r.user_name, 
+															IssuesHelper.options_for_filter([[ :status_id, 'o', ''], [ custom_filter, '=',  r.user_id]], 
+																															{:project_id => @project.identifier, :group_by => "status"}) %></nobr>
+						<% if Setting.plugin_enhanced_queries['show_count']%><span class="count">(<%= h IssuesHelper.get_open_issues_on_user(custom_filter, r.user_id, @project) %>)</span><% end %>
+					</li>
 				<% roles_id=r.roles_id %> 
 			<% else %>
-				<li><nobr><%= link_to_filter r.user_name, [[ :status_id, 'o', '44444'], [ :assigned_to_id, '=',  r.user_id]], {:project_id => @project.identifier, :group_by => "status"} %></nobr>
-				<% if Setting.plugin_enhanced_queries['show_count']%> <span class="count">(<%= h IssuesHelper.get_total_issues_on_assigned_to_id(r.user_id, @project) %>)</span> <% end %>
+				<li><nobr><%= link_to r.user_name, 
+															IssuesHelper.options_for_filter([[ :status_id, 'o', ''], [ custom_filter, '=',  r.user_id]], 
+																														  {:project_id => @project.identifier, :group_by => "status"}) %></nobr>
+				<% if Setting.plugin_enhanced_queries['show_count']%><span class="count">(<%= h IssuesHelper.get_open_issues_on_user(custom_filter, r.user_id, @project) %>)</span><% end %>
 				</li>
 			<% end %>
 		<% end %>

@@ -12,3 +12,4 @@ ru:
   label_i_am_watching: "Наблюдаемые"
   label_i_created: "Созданные мной"
   label_assigned_to_me: "Назначенные мне"
+  label_enhanced_queries_selector: "Соответсвие выборки типу пользователя"

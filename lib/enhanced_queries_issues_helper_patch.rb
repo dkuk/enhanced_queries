@@ -10,16 +10,44 @@ module EnhancedQueriesIssuesHelperPatch
 
 	# Same as typing in the class 
     base.class_eval do
-		unloadable
-		alias_method_chain :render_sidebar_queries, :enhance_queries
-		alias_method_chain :sidebar_queries, :enhance_queries
-		alias_method_chain :query_links, :enhance_queries
-	end	
-    
-
+			unloadable
+			alias_method_chain :render_sidebar_queries, :enhance_queries
+			alias_method_chain :sidebar_queries, :enhance_queries
+			alias_method_chain :query_links, :enhance_queries
+		end
   end
 
   module ClassMethods   
+
+    # returns hash suitable for passing it to the <tt>to_link</tt>
+    # === parameters
+    # * <i>filters</i> = array of arrays. each child array is an array of strings:
+    #                    name, operator and value
+    # === example
+    # link_to 'foobar', link_to_filter_options [[ :tags, '~', 'foobar' ]]
+    #
+    # filters = [[ :tags, '~', 'bazbaz' ], [:status_id, 'o']]
+    # link_to 'bazbaz', link_to_filter_options filters
+    def options_for_filter(filters, opts = {})
+      options = {
+        :controller => 'issues',
+        :action => 'index',
+        :set_filter => 1,
+        :fields => [],
+        :values => {},
+        :operators => {}
+      }
+
+      filters.each do |f|
+        name, operator, value = f
+        
+        options[:fields].push(name)
+        options[:operators][name] = operator
+        options[:values][name] =  value.kind_of?(Array) ? value : [value]   
+      end
+      opts.merge! options
+    end
+
     # Methods to add to the Issue class
 	def get_total_of_issues(query_id, project)
       cond = "project_id IS NULL"
@@ -49,18 +77,42 @@ module EnhancedQueriesIssuesHelperPatch
 		GROUP BY roles_name, roles_id, user_name, user_id
 		ORDER BY roles_name "
 	end	
-	
-	def get_total_issues_on_assigned_to_id(assigned_to_id, project)
-		Issue.count :conditions => "issues.assigned_to_id="+assigned_to_id.to_s+" AND issues.project_id="+project.id.to_s+""	
+
+	def get_open_issues_on_user(filter_field, user_id, project)
+    filter_clause = ""
+    if  filter_field =~ /^cf_(\d+)$/
+      custom_field_id = $1
+      db_table = CustomValue.table_name
+      filter_clause = "AND #{Issue.table_name}.id IN (SELECT #{Issue.table_name}.id FROM #{Issue.table_name} LEFT OUTER JOIN #{db_table} ON #{db_table}.customized_type='Issue' AND #{db_table}.customized_id=#{Issue.table_name}.id AND #{db_table}.custom_field_id=#{custom_field_id} WHERE 
+      #{db_table}.value IN (#{user_id}) )"
+    else  
+      filter_clause = "AND #{filter_field}=#{user_id}"
+    end  
+
+		Issue.joins(:status).where("is_closed=0 #{filter_clause} AND project_id=#{project.id}").count
 	end
-	
-	def get_total_issues_on_assigned_to_role(assigned_to_role, project)
-		query=Query.new(:name => "_", :filters => {'assigned_to_role' => {:operator => "=", :values => [assigned_to_role.to_s]}})
-		statement=query.statement
-		statement+=" AND project_id="+project.id.to_s if(project)
-		Issue.count(:include => [:status, :project], :conditions => statement)
+
+	def get_open_issues_on_role(filter_field, role_id, project)
+		role_users = User.find_by_sql("
+			SELECT u.* FROM #{User.table_name} u
+				INNER JOIN #{Member.table_name} m ON m.user_id=u.id AND m.project_id=#{project.id}
+				INNER JOIN #{MemberRole.table_name} mr ON mr.member_id=m.id AND mr.role_id=#{role_id}
+			WHERE u.type!='Group' ")
+		users_ids = role_users.collect{|u| u.id }.join(', ')
+
+    filter_clause = ""
+    if  filter_field =~ /^cf_(\d+)$/
+      custom_field_id = $1
+      db_table = CustomValue.table_name
+      filter_clause = "AND #{Issue.table_name}.id IN (SELECT #{Issue.table_name}.id FROM #{Issue.table_name} LEFT OUTER JOIN #{db_table} ON #{db_table}.customized_type='Issue' AND #{db_table}.customized_id=#{Issue.table_name}.id AND #{db_table}.custom_field_id=#{custom_field_id} WHERE 
+      #{db_table}.value IN (#{users_ids}) )"
+    else  
+      filter_clause = "AND #{filter_field} IN (#{users_ids})"
+    end  
+
+		Issue.joins(:status).where("is_closed=0 #{filter_clause} AND project_id=#{project.id}").count
 	end	
-	
+
 	def get_total_assigned_me_issues(project)
 		query=Query.new(:name => "_", :filters => {'status_id' => {:operator => "o", :values => ["143535"]}, 'assigned_to_id' => {:operator => "=", :values => ["me"]}})
 		statement=query.statement
