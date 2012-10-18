@@ -1,0 +1,13 @@
+<table cellspacing="15">
+<tr>
+<td><%=l(:label_enable_enhanced_queries)%></td>
+<td><%=check_box_tag 'settings[enable]', true, @settings['enable'] == "true" %></td>
+</tr>
+<tr>
+<td><%=l(:label_enable_counts)%></td>
+<td><%=check_box_tag 'settings[show_count]', true, @settings['show_count'] == "true" %></td>
+</tr>
+
+
+
+</table>

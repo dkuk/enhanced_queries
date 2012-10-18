@@ -1,0 +1,5 @@
+# Ignore sublime project files
+*.sublime*
+todo.txt
+sftp-config.json
+.gitattributes

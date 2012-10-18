@@ -1,0 +1,56 @@
+#sidebar a.favorite
+	{
+	background-color: #c70808;
+	padding: 2px;
+	margin-top: 13px;
+	color: #fff;
+	text-decoration: none;
+	}
+	
+#sidebar h4
+	{
+	color: #666;
+	margin: 5px 0px 5px 0px ;
+	}
+#sidebar h3
+	{
+	margin: 15px 0px 5px 0px ;
+	}
+#sidebar ul 
+	{
+	margin: 5px 0px 5px 15px;
+	}
+	
+.indent
+	{
+	margin-top: 5px;
+	}
+	
+input.small
+	{
+	width: 40px;
+	}
+	
+input.middle
+	{
+	width: 220px;
+	}	
+	
+#e_q_mine_issues h3
+	{
+	margin: 0px 0px 5px 0px;
+	color: #a60c0c;
+	}
+	
+.raised {
+	width: 258px;
+	padding: 6px;
+	margin: 15px 0px 5px 0px;
+	border: 1px solid #A60C0C;
+	border-radius: 8px 8px 8px 8px;
+	background: #FEE;
+	position: relative;
+	left: -8px;
+}        
+ 
+	
