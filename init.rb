@@ -20,5 +20,4 @@ Rails.application.config.to_prepare do
   QueriesController.send(:include, EnhancedQueriesQueriesControllerPatch)
 end
 
-require 'hooks/views_sidebar_hook'
 require 'hooks/views_enhanced_queries_hook'
