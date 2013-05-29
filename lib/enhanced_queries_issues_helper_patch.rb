@@ -193,23 +193,10 @@ module EnhancedQueriesIssuesHelperPatch
 	
     def sidebar_queries_with_enhance_queries
 		if(Setting.plugin_enhanced_queries['enable'] == 'true')
-=begin
-			unless @sidebar_queries
-			  # User can see public queries and his own queries
-			  visible = ARCondition.new(["is_public = ? OR user_id = ?", true, (User.current.logged? ? User.current.id : 0)])
-			  # Project specific queries and global queries
-			  visible << (@project.nil? ? ["project_id IS NULL"] : ["project_id IS NULL OR project_id = ?", @project.id])
-			  visible << (["query_categories.id=queries.category_id OR queries.category_id IS NULL"])
-			  @sidebar_queries = Query.find(:all,
-											:select => "queries.id, queries.name, is_public, project_id, category_id, query_categories.name",
-											:include =>[:query_category],
-											:order => "query_categories.name ASC, queries.order ASC, queries.name ASC",
-											:conditions => visible.conditions)
-			end
-			@sidebar_queries
-=end		
-			@sidebar_queries ||= Query.visible.all(
-				:order => "#{QueryCategory.table_name}.name ASC, #{Query.table_name}.order ASC, #{Query.table_name}.name ASC",
+
+
+			@sidebar_queries ||= IssueQuery.visible.all(
+				:order => "#{QueryCategory.table_name}.name ASC, #{IssueQuery.table_name}.order ASC, #{IssueQuery.table_name}.name ASC",
 				# Project specific queries and global queries
 				:include =>[:query_category],
 				:conditions => (@project.nil? ? ["project_id IS NULL"] : ["project_id IS NULL OR project_id = ?", @project.id])
