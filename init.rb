@@ -16,7 +16,7 @@ end
 
 Rails.application.config.to_prepare do
   IssuesHelper.send(:include, EnhancedQueriesIssuesHelperPatch)
-  Query.send(:include, EnhancedQueriesQueryPatch)
+  IssueQuery.send(:include, EnhancedQueriesQueryPatch)
   QueriesController.send(:include, EnhancedQueriesQueriesControllerPatch)
 end
 
