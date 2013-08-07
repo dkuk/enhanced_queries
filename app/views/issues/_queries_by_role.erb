@@ -1,6 +1,7 @@
 <% if(Setting.plugin_enhanced_queries['enable'] == 'true') %>
+
 	<% if @project %>
-				
+		
 		<% specific_roles = Setting.plugin_enhanced_queries['specific_roles'].nil? ? [] : Setting.plugin_enhanced_queries['specific_roles'] %>
 		<% custom_rule = Setting.plugin_enhanced_queries['custom_rule'].nil? ? nil : Setting.plugin_enhanced_queries['custom_rule'] %>
 	
