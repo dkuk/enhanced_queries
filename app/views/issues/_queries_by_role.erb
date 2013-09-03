@@ -1,38 +1,48 @@
-<% if(Setting.plugin_enhanced_queries['enable'] == 'true') %>
+<% if @project && (Setting.plugin_enhanced_queries['enable'] == 'true') %>
+  <h3><%= l(:queries_by_roles) %></h3>    
+  <% specific_roles = Setting.plugin_enhanced_queries['specific_roles'].nil? ? [] : Setting.plugin_enhanced_queries['specific_roles'] %>
+  <% custom_rule = Setting.plugin_enhanced_queries['custom_rule'].nil? ? nil : Setting.plugin_enhanced_queries['custom_rule'] %>
 
-	<% if @project %>
-		
-		<% specific_roles = Setting.plugin_enhanced_queries['specific_roles'].nil? ? [] : Setting.plugin_enhanced_queries['specific_roles'] %>
-		<% custom_rule = Setting.plugin_enhanced_queries['custom_rule'].nil? ? nil : Setting.plugin_enhanced_queries['custom_rule'] %>
-	
-		<% roles = IssuesHelper.render_queries_by_role(@project) %>
-		<% i = 0 %>
-		
-		
-		<% @project.users_by_role.sort_by{|k,v| k.name}.each do |role, users| %>
-			<% if i==0 %>
-				<h3><%= l(:queries_by_roles) %></h3>
-				<ul>
-			<% end %>
 
-			<% custom_filter = specific_roles.include?(role.id.to_s) ? custom_rule : :assigned_to_id %>
+  <% sql = "SELECT roles.id, roles.name, members.user_id, CONCAT(users.lastname, ' ', users.firstname) AS 'user_name' FROM members
+              INNER JOIN member_roles ON member_roles.member_id=members.id
+              INNER JOIN roles ON roles.id=member_roles.role_id
+              INNER JOIN users ON users.id=members.user_id AND users.type='User'
+            WHERE members.project_id=#{project.id} AND users.status=#{Principal::STATUS_ACTIVE}
+            GROUP BY roles.name, roles.id, user_name, members.user_id
+            ORDER BY roles.name, users.lastname, users.firstname" %>
+  <% roles = ActiveRecord::Base.connection.select_all(sql) %>            
+  <% prev_role = roles.first %>
+  <% users_list = '' %>
+  <% custom_filter = prev_role && specific_roles.include?(prev_role['id'].to_s) ? custom_rule : :assigned_to_id %>
+  
+  <ul>
+    <% roles.each do |role| %>
+      <% if prev_role['id'] != role['id'] %>
+        <li><%= prev_role['name'] %>   
+          <ul>
+            <%= users_list.html_safe %>
+          </ul>
+        </li>
+        <% users_list = '' %>
+        <% custom_filter = specific_roles.include?(role['id'].to_s) ? custom_rule : :assigned_to_id %>        
+      <% end %>
+      <% users_list << "<li><nobr>" %>
+      <% users_list << link_to( role['user_name'], 
+                               IssuesHelper.options_for_filter([[ :status_id, 'o', ''], [ custom_filter, '=',  role['user_id'] ]], 
+                                                              {:project_id => @project.identifier, :group_by => "status"}) ) %>
+      <% users_list << "</nobr>" %>
+      <% users_list << "<span class=\"count\">("+IssuesHelper.get_open_issues_on_user(custom_filter, role['user_id'], @project)+")</span>" if Setting.plugin_enhanced_queries['show_count'] %>
+      <% users_list << "</li>" %>      
+      <% prev_role = role %>
+    <% end %>
 
-			<li><%= role.name %>
-				<ul><li><nobr><%= users.sort.collect{|u| (link_to u.name,
-																								 IssuesHelper.options_for_filter([[ :status_id, 'o', ''], [ custom_filter, '=',  u.id]], 
-                                                 {:project_id => @project.identifier, :group_by => "status"})) + 
-                                               	 (Setting.plugin_enhanced_queries['show_count'] ? "<span class=\"count\">(#{h IssuesHelper.get_open_issues_on_user(custom_filter, u.id, @project)})</span>" : '').html_safe
-                                            }.join("</nobr></li><li><nobr>").html_safe %></nobr></li></ul>
-			</li>
-
-			<% i+=1 %>
-		<% end %>
-
-	<% if i!=0 %>
-		</ul>
-	<% end %>
-
-	<% end %>
+    <% if prev_role %>
+        <li><%= prev_role['name'] %>   
+          <ul>
+            <%= users_list.html_safe %>
+          </ul>
+        </li>   
+    <% end %>
+  </ul>
 <% end %>
-
-

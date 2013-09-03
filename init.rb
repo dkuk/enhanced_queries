@@ -2,16 +2,14 @@ require 'redmine'
 
 Redmine::Plugin.register :enhanced_queries do
   name 'Enhanced Queries plugin'
-  author 'Pitin Vladimir Vladimirovich'
+  author 'Vladimir Pitin'
   author_url 'http://pitin.su'
-  version '0.1'
-  url 'http://pitin.su'
+  version '0.2'
+  url 'http://rmplus.pro'
   
   settings  :partial => 'settings/enhanced_queries_settings',
-            :default => {
-            "enable" => "0", 
-			"show_count" => "0"
-            }  
+            :default => { 'enable' => false, 
+			                    'show_count' => false }  
 end
 
 Rails.application.config.to_prepare do
