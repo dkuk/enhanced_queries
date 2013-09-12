@@ -1,3 +1,4 @@
+# English strings go here for Rails i18n
 en:
   eq_label_my_queries: "My queries"
   eq_label_current_project: "General queries"
@@ -13,3 +14,4 @@ en:
   label_i_created: "Created by me"
   label_assigned_to_me: "Assigned to me"
   label_enhanced_queries_selector: "Complies selection with user type"
+  plugin_test_enhanced_queries: "enhanced_queries"
