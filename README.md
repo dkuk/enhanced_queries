@@ -2,7 +2,18 @@
 
 #### Plugin for Redmine
 
-Some queries improvmets for Redmine
+Plugin implements some queries improvements for Redmine.
+
+Issue queries are splitted by categories. 
+When you create new query, you need to specify Category name and Order number in queries list of this category.
+Plugin also implements queries by members of the current project.
+
+![Interface](https://github.com/dkuk/enhanced_queries/raw/master/screenshots/interface.png "Interface")
+![Interface2](https://github.com/dkuk/enhanced_queries/raw/master/screenshots/interface2.png "Interface2")
+
+In plugin settings you can specify link "project user role" - "issue user field" to specify filter in queries by members.
+
+![Settings](https://github.com/dkuk/enhanced_queries/raw/master/screenshots/settings.png "settings")
 
 #### Installation
 To install plugin, go to the folder "plugins" in root directory of Redmine.
