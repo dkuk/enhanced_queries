@@ -32,7 +32,7 @@
                                IssuesHelper.options_for_filter([[ :status_id, 'o', ''], [ custom_filter, '=',  role['user_id'] ]], 
                                                               {:project_id => @project.identifier, :group_by => "status"}) ) %>
       <% users_list << "</nobr>" %>
-      <% users_list << "<span class=\"count\">("+IssuesHelper.get_open_issues_on_user(custom_filter, role['user_id'], @project)+")</span>" if Setting.plugin_enhanced_queries['show_count'] %>
+      <% users_list << "<span class=\"count\">("+IssuesHelper.get_open_issues_on_user(custom_filter, role['user_id'], @project).to_s+")</span>" if Setting.plugin_enhanced_queries['show_count'] %>
       <% users_list << "</li>" %>      
       <% prev_role = role %>
     <% end %>

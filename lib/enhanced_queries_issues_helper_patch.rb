@@ -48,16 +48,15 @@ module EnhancedQueriesIssuesHelperPatch
       opts.merge! options
     end
 
-    # Methods to add to the Issue class
-    # def get_total_of_issues(query_id, project)
-    #   cond = "project_id IS NULL"
-    #   cond << " OR project_id = #{project.id}" if project
-    #   query = Query.find(query_id, :conditions => cond) 
-    #   query.issue_count.to_s
-    #   statement=query.statement   
-    #   statement+=" AND project_id="+project.id.to_s if(project)
-    #   Issue.visible.count(:include => [:status, :project], :conditions =>statement).to_s
-    # end
+    def get_total_of_issues(query_id, project)
+      cond = "project_id IS NULL"
+      cond << " OR project_id = #{project.id}" if project
+      query = Query.find(query_id, :conditions => cond) 
+      query.issue_count.to_s
+      statement=query.statement   
+      statement+=" AND project_id="+project.id.to_s if(project)
+      Issue.visible.count(:include => [:status, :project], :conditions =>statement).to_s
+    end
   
     def get_open_issues_on_user(filter_field, user_id, project)
       filter_clause = ""
