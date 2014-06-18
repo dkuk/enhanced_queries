@@ -13,6 +13,10 @@
   <td><%=check_box_tag 'settings[show_count]', true, @settings['show_count'] == "true" %></td>
 </tr>
 <tr>
+  <td><%=l(:label_enable_specific_roles)%></td>
+  <td><%=check_box_tag 'settings[show_specitic_roles]', true, @settings['show_specitic_roles'] == "true" %></td>
+</tr>
+<tr>
   <td style="vertical-align:top;"><%=l(:label_enhanced_queries_selector)%></td>
   <td style="vertical-align:top;"><%= select_tag('settings[specific_roles]',
       options_from_collection_for_select( Role.order("name"),
