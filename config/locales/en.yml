@@ -15,3 +15,4 @@ en:
   label_assigned_to_me: "Assigned to me"
   label_enhanced_queries_selector: "Complies selection with user type"
   plugin_test_enhanced_queries: "enhanced_queries"
+  label_enable_specific_roles: "Show specific roles"
