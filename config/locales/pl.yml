@@ -1,0 +1,18 @@
+# English strings go here for Rails i18n
+pl:
+  eq_label_my_queries: "Moje kwerendy"
+  eq_label_current_project: "Ogólno dostępne kwerendy"
+  eq_label_all_project: "Standartowe kwerendy"
+  mine_issues: "Moje zagadnienia"
+  label_enable_enhanced_queries: "Właczenie wtyczki"
+  label_enable_counts: "Pokazanie liczby zagadnień"
+  queries_by_roles: "Kwerendy po pracownikach"
+  label_query_cats_and_order: "Query category and sort order"
+  label_query_cats: "Nazwa kategorii dla kwerendy"
+  label_query_order: "Kolejność"
+  label_i_am_watching: "Obserwuję"
+  label_i_created: "Utworzone przeze mnie"
+  label_assigned_to_me: "Przypisane do mnie"
+  label_enhanced_queries_selector: "Complies selection with user type"
+  plugin_test_enhanced_queries: "enhanced_queries"
+  label_enable_specific_roles: "Show specific roles"
