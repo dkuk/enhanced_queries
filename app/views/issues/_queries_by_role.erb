@@ -1,4 +1,4 @@
-<% if @project && (Setting.plugin_enhanced_queries['enable'] == 'true') %>
+<% if @project && (Setting.plugin_enhanced_queries['enable'] == 'true') && (Setting.plugin_enhanced_queries['show_specitic_roles'] == 'true' %>
   <h3><%= l(:queries_by_roles) %></h3>    
   <% specific_roles = Setting.plugin_enhanced_queries['specific_roles'].nil? ? [] : Setting.plugin_enhanced_queries['specific_roles'] %>
   <% custom_rule = Setting.plugin_enhanced_queries['custom_rule'].nil? ? nil : Setting.plugin_enhanced_queries['custom_rule'] %>
